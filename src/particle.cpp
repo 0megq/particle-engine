@@ -1,10 +1,9 @@
 #include "particle.hpp"
 
-Particle::Particle(raylib::Vector3 pos) {
-    m_pos = pos;
-    m_radius = 1.0f;
-}
 
-void Particle::draw() {
-    DrawSphere(m_pos, m_radius, raylib::Color::Red());
+void Particle::updatePosition(float dt) {
+    auto posNew = posCur * 2.0f - posOld + acc * (dt * dt) * 0.5f;
+    posOld = posCur;
+    posCur = posNew;
+    acc = {};
 }

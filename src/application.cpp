@@ -1,4 +1,5 @@
-#include "raylib-cpp.hpp"
+#include <iostream>
+#include <random>
 #include "application.hpp"
 #include "particle.hpp"
 
@@ -8,33 +9,41 @@ Application::Application(int screenWidth, int screenHeight) :
     m_screenHeight(screenHeight), 
     m_window(screenWidth, screenHeight, "Particle Engine") 
 {
-    m_window.SetTargetFPS(60);
-    m_camera.SetPosition(raylib::Vector3(0.0f, 10.0f, -10.0f));
-    m_camera.SetTarget(raylib::Vector3::Zero());
-    m_camera.SetUp(raylib::Vector3(0.0f, 1.0f, 0.0f));
+    m_camera.SetPosition({-70.0f, 5.0f, 0.0f});
+    m_camera.SetTarget({});
+    m_camera.SetUp({0.0f, 1.0f, 0.0f});
+    // m_particleSystem.addParticle({10.0f, 5.0f, 8.0f}, {}, fixedUpdateDelta);
 
-    m_particles.push_back(Particle(raylib::Vector3(0.0f, 0.0f, 0.0f)));
 }
 
 void Application::run() {
     while (!m_window.ShouldClose()) {
-        auto delta = m_window.GetFrameTime();
+        auto dt = m_window.GetFrameTime();
+
         // Update particles
+        m_fixedUpdateAccumulator += dt;
+        if (m_fixedUpdateAccumulator > fixedUpdateDelta) {
+            if (m_fixedFrameCount % 5 == 0) {
+                m_particleSystem.addParticle({5.0f, 5.0f, (float)GetRandomValue(4,6)}, {}, fixedUpdateDelta, raylib::Color((char)GetRandomValue(0,255), (char)GetRandomValue(0,255), (char)GetRandomValue(0,255)));
+            }
+            m_fixedUpdateAccumulator -= fixedUpdateDelta;
+            m_particleSystem.update(fixedUpdateDelta * 4);
+            m_fixedFrameCount++;
+        }
 
         // Draw particles
         render();
+        m_frameCount++;
     }
 }
 
 void Application::render() {
     m_window.BeginDrawing();
-    m_window.ClearBackground(WHITE);
+    m_window.ClearBackground(BLACK);
 
     m_camera.BeginMode();
 
-    for (Particle &p : m_particles) {
-        p.draw();
-    }
+    m_particleSystem.render();
 
     m_camera.EndMode();
 
