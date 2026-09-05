@@ -2,6 +2,7 @@
 #define PARTICLE_H
 #include "raylib-cpp.hpp"
 
+// Header-only struct
 struct Particle {
     float radius = 1.0f;
     raylib::Color color;
@@ -11,7 +12,12 @@ struct Particle {
 
     // Update position using Verlet integration with internal fields
     // `pos_cur`, `pos_old`, and `acc`. `dt` is the time step (in seconds).
-    void updatePosition(float dt);
+    void updatePosition(float dt) {
+        auto posNew = posCur * 2.0f - posOld + acc * (dt * dt) * 0.5f;
+        posOld = posCur;
+        posCur = posNew;
+        acc = {};
+    }
 };
 
 
