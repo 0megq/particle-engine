@@ -28,4 +28,4 @@ class Application {
         void shutdown();
 };
 
-#endif APPLICATION_H
+#endif
