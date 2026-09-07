@@ -4,8 +4,9 @@ void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
         applyGravity();
         updatePositions(dt / subSteps);
+        resolveCollisionsOctree();
         applyConstraints();
-        resolveCollisions();
+        
     }
 }
 
@@ -30,19 +31,38 @@ void ParticleSystem::applyConstraints() {
     }
 }
 
-void ParticleSystem::resolveCollisions() {
-    for (Particle &p : m_particles) {
-        for (Particle &o : m_particles) {
-        auto const combinedRadius = (o.radius + p.radius);
+void ParticleSystem::resolveCollisionsOctree() {
+    // insert quadtree heres
+    Octree tree = Octree(m_particles);
+
+    for (std::pair<Particle *, Particle *> pair : tree.findAllIntersections()) {
+        auto p = pair.first;
+        auto o = pair.first;
+        auto const combinedRadius = (o->radius + p->radius);
         auto const combinedRadiusWithTolerance = combinedRadius - collisionTolerance;
-        auto const pToO = o.posCur - p.posCur;
+        auto const pToO = o->posCur - p->posCur;
         if (pToO.LengthSqr() < combinedRadiusWithTolerance * combinedRadiusWithTolerance) {
             auto const depth = combinedRadius - pToO.Length();
             auto const normal = pToO.Normalize();
-            p.posCur += -normal * depth * 0.5f;
-            o.posCur += normal * depth * 0.5f;
+            p->posCur += -normal * depth * 0.5f;
+            o->posCur += normal * depth * 0.5f;
         }
     }
+}
+
+void ParticleSystem::resolveCollisionsN2() {
+    for (Particle &p : m_particles) {
+        for (Particle &o : m_particles) {
+            auto const combinedRadius = (o.radius + p.radius);
+            auto const combinedRadiusWithTolerance = combinedRadius - collisionTolerance;
+            auto const pToO = o.posCur - p.posCur;
+            if (pToO.LengthSqr() < combinedRadiusWithTolerance * combinedRadiusWithTolerance) {
+                auto const depth = combinedRadius - pToO.Length();
+                auto const normal = pToO.Normalize();
+                p.posCur += -normal * depth * 0.5f;
+                o.posCur += normal * depth * 0.5f;
+            }
+        }
     }
 }
 

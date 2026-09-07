@@ -3,6 +3,7 @@
 #include <vector>
 #include "raylib-cpp.hpp"
 #include "particle.hpp"
+#include "octree.hpp"
 
 class ParticleSystem {
     private:
@@ -14,13 +15,15 @@ class ParticleSystem {
         void updatePositions(float dt);
         void applyGravity();
         void applyConstraints();
-        void resolveCollisions();
+        
+        void resolveCollisionsOctree();
+        void resolveCollisionsN2();
 
     public:
         // Must be called with a fixed dt
         void update(float dt);
         void render();
-        void addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius = 0.2f);
+        void addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius);
 };
 
 #endif

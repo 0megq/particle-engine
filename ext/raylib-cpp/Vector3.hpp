@@ -200,6 +200,13 @@ public:
     }
 
     /**
+     * New vector with all components positive
+     */
+    Vector3 Abs() {
+        return {abs(x), abs(y), abs(z)};
+    }
+
+    /**
      * Calculate vector length
      */
     RLCPP_NODISCARD float Length() const { return Vector3Length(*this); }
