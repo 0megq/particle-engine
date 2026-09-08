@@ -177,3 +177,9 @@ void Octree::insert(Particle *particle) {
 
     m_children[static_cast<std::size_t>(octant)]->insert(particle);
 }
+
+std::vector<std::pair<Particle *, Particle *>> Octree::findAllIntersections() const {
+    std::vector<std::pair<Particle *, Particle *>> res;
+    findAllIntersections(res);
+    return res;
+}

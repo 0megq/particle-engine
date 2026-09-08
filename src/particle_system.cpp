@@ -35,7 +35,7 @@ void ParticleSystem::resolveCollisionsOctree() {
     // insert quadtree heres
     Octree tree = Octree(m_particles);
 
-    for (std::pair<Particle *, Particle *> pair : tree.findAllIntersections()) {
+    for (auto &pair : tree.findAllIntersections()) {
         auto p = pair.first;
         auto o = pair.first;
         auto const combinedRadius = (o->radius + p->radius);
