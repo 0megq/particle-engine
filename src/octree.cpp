@@ -1,5 +1,6 @@
 #include <octree.hpp>
 #include <cassert>
+#include <algorithm>
 
 raylib::Vector3 Octree::indexToVec(std::size_t idx) {
     // I chose to use bitwise operators instead of
@@ -113,29 +114,37 @@ bool Octree::isLeaf() const {
     return m_children[0].get() == nullptr;
 }
 
-Octree::Octree(std::vector<Particle> &particles) : m_depth(0) {
-    m_particles.resize(capacity);
+Octree::Octree(std::vector<Particle> &particles, const AABB &boundary) : m_depth(0) {
+    m_particles.reserve(capacity);
 
     // Get boundary
-    bool first = true;
-    raylib::Vector3 min;
-    raylib::Vector3 max;
+    if (!boundary.isZero()) {
+        m_boundary = boundary;
+    } else {
+        bool first = true;
+        raylib::Vector3 min;
+        raylib::Vector3 max;
 
-    // Set boundary
-    for (const auto &particle : particles) {
-        if (first) {
-            min = particle.posCur;
-            max = particle.posCur;
-            first = false;
-            continue;
+        // Set boundary
+        for (const auto &particle : particles) {
+            if (first) {
+                min = particle.posCur;
+                max = particle.posCur;
+                first = false;
+                continue;
+            }
+
+            min = min.Min(particle.posCur - raylib::Vector3::One() * particle.radius);
+            max = max.Max(particle.posCur + raylib::Vector3::One() * particle.radius);
         }
 
-        min = min.Min(particle.posCur);
-        max = max.Min(particle.posCur);
-    }
+	auto halfSize = (max - min) * 0.5;
+	halfSize.x = halfSize.y = halfSize.z = std::max({halfSize.x, halfSize.y, halfSize.z});
 
-    m_boundary.halfSize = (max - min) * 0.5;
-    m_boundary.center = (max + min) * 0.5;
+	// Add tolerance so halfSize is not zero when we have just a single particle
+        m_boundary.halfSize = halfSize + raylib::Vector3::One() * 0.1;
+        m_boundary.center = (max + min) * 0.5;
+    }
 
     // Insert all particles
     for (auto &particle : particles) {
@@ -145,11 +154,11 @@ Octree::Octree(std::vector<Particle> &particles) : m_depth(0) {
 
 
 Octree::Octree(const AABB &boundary, std::size_t depth) : m_boundary(boundary), m_depth(depth) {
-    m_particles.resize(capacity);
+    m_particles.reserve(capacity);
 }
 
 void Octree::insert(Particle *particle) {
-    const AABB particleAABB = AABB{particle->posCur, raylib::Vector3::One() * particle->radius};
+    const AABB particleAABB = AABB{particle->posCur, particle->radius};
 
     // Particle is outside the bounds, so don't insert
     assert(m_boundary.intersects(particleAABB) && "Octree: inserting particle that is not within boundary!");

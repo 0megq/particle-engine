@@ -1,0 +1,8 @@
+// raddbg 0.9.28 project file
+
+target:
+{
+  executable: "build/Debug/particle-engine.exe"
+  working_directory: "build/Debug/"
+  enabled: 1
+}

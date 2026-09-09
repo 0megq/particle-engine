@@ -1,4 +1,5 @@
 #include "particle_system.hpp"
+#include <cstring>
 
 void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
@@ -37,7 +38,7 @@ void ParticleSystem::resolveCollisionsOctree() {
 
     for (auto &pair : tree.findAllIntersections()) {
         auto p = pair.first;
-        auto o = pair.first;
+        auto o = pair.second;
         auto const combinedRadius = (o->radius + p->radius);
         auto const combinedRadiusWithTolerance = combinedRadius - collisionTolerance;
         auto const pToO = o->posCur - p->posCur;

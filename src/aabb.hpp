@@ -4,6 +4,8 @@
 #include "raylib-cpp.hpp"
 #include "particle.hpp"
 
+struct AABB;
+
 /**
  * Simple AABB struct storing center and halfSize
  * 
@@ -17,7 +19,12 @@ struct AABB {
     raylib::Vector3 center;
     raylib::Vector3 halfSize;
 
-    bool intersects(const AABB &other) {
+    // This check is exact
+    bool isZero() const {
+        return center == raylib::Vector3{} && halfSize == raylib::Vector3{};
+    }
+
+    bool intersects(const AABB &other) const {
         return (abs(center.x - other.center.x) < halfSize.x + other.halfSize.x) &&
                 (abs(center.y - other.center.y) < halfSize.y + other.halfSize.y) &&
                 (abs(center.z - other.center.z) < halfSize.z + other.halfSize.z);

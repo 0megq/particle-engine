@@ -23,7 +23,7 @@ void Application::run() {
         // Update particles
         m_fixedUpdateAccumulator += dt;
         while (m_fixedUpdateAccumulator > fixedUpdateDelta) {
-            if (m_fixedFrameCount % 20 == 0) {
+            if (m_fixedFrameCount % 5 == 0) {
                 m_particleSystem.addParticle({5.0f, 5.0f, (float)GetRandomValue(4,6)}, {}, fixedUpdateDelta, raylib::Color((char)GetRandomValue(0,255), (char)GetRandomValue(0,255), (char)GetRandomValue(0,255)), 0.5f);
             }
             m_fixedUpdateAccumulator -= fixedUpdateDelta;
