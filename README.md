@@ -17,8 +17,13 @@ Uses raylib library. CMakeLists.txt is a modified version from [raylib-cpp's cma
   - sleeping still particles
   - sweep and prune with insertion sort (insertion sort because of temporal coherence)
     - optimized SAP method: https://ieeexplore.ieee.org/document/10121435
+    - https://leanrada.com/notes/sweep-and-prune-2/
+  - store particles as a structure of arrays for cache efficiency
 - moving around with camera
 - stick constraints
+- forces on particles
+  - press a button, or mouse
+  - shake the window
 
 references:
 - https://www.flipcode.com/archives/Octree_Implementation.shtml, inspiration for using centered-aabb
