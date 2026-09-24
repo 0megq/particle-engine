@@ -23,3 +23,4 @@ Uses raylib library. CMakeLists.txt is a modified version from [raylib-cpp's cma
 references:
 - https://www.flipcode.com/archives/Octree_Implementation.shtml, inspiration for using centered-aabb
 - https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html inspo for placing shared nodes only in parent
+- https://leanrada.com/notes/sweep-and-prune/

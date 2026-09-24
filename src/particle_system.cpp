@@ -1,11 +1,13 @@
 #include "particle_system.hpp"
 #include <cstring>
+#include <algorithm>
+#include <map>
 
 void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
         applyGravity();
         updatePositions(dt / subSteps);
-        resolveCollisionsOctree();
+        resolveCollisionsN2();
         applyConstraints();
         
     }
@@ -65,6 +67,49 @@ void ParticleSystem::resolveCollisionsN2() {
             }
         }
     }
+}
+
+void ParticleSystem::resolveCollisionsSAP() {
+    // intervals will need to have reference to their object as a pointer or stable idx (handler would be cool)
+    // and interval needs isLeft flag. the actual position will just be grabbed from the actual object
+    // this will be useful later when i want to implement insertion sort and keep the list across frames
+    // we will need to do extra checks to make sure the indices or pointers remain valid
+
+    // get sorted intervals in X and add any new particles
+    if (m_edgesX.empty()) {
+        // add all intervals - O(N)
+        for (size_t idx = 0; idx < m_particles.size(); idx++) {
+            m_edgesX.push_back(
+                SAPEdge {
+                    m_particles[idx].posCur.x - m_particles[idx].radius,
+                    idx,
+                    true,
+                }
+            );
+            m_edgesX.push_back(
+                SAPEdge {
+                    m_particles[idx].posCur.x + m_particles[idx].radius,
+                    idx,
+                    false,                    
+                }
+            );
+        }
+
+        // sort intervals - O(Nlog(N))
+        std::sort(m_edgesX.front(), m_edgesX.back(), [](SAPEdge *left, SAPEdge *right) -> bool {return left->pos < right->pos;});
+    }
+
+
+    // loop through intervals, add object to active list on start interval, remove on end interval
+        // build a list of pairs in a hashset so accessing is quick
+
+    // repeat for each 
+    
+    // narrow phase on the pairs
+
+    // after this point sorting of the list cannot be guaranteed because the particle may change positions
+    // for now i just clear the list
+    m_edgesX.clear();
 }
 
 void ParticleSystem::render() {
