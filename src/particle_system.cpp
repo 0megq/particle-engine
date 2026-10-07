@@ -1,15 +1,19 @@
 #include "particle_system.hpp"
+#include <tracy/Tracy.hpp>
+#include <iostream>
 #include <cstring>
 #include <algorithm>
 #include <map>
+#include <cstdio>
+#include <cmath>
 
 void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
         applyGravity();
         updatePositions(dt / subSteps);
-        resolveCollisionsN2();
+        collisionsTestedThisFrame = 0;
+        resolveCollisionsOctree();
         applyConstraints();
-        
     }
 }
 
@@ -35,10 +39,13 @@ void ParticleSystem::applyConstraints() {
 }
 
 void ParticleSystem::resolveCollisionsOctree() {
+    ZoneScoped;
     // insert quadtree heres
-    Octree tree = Octree(m_particles);
-
-    for (auto &pair : tree.findAllIntersections()) {
+    lastOctree = Octree(m_particles);
+    // std::cout << "particles in root" << lastOctree.getParticleCount() << std::endl;
+    // std::cout << "boundary: " << lastOctree.getBoundary().toString() << std::endl;
+    
+    for (auto &pair : lastOctree.findAllIntersections()) {
         auto p = pair.first;
         auto o = pair.second;
         auto const combinedRadius = (o->radius + p->radius);
@@ -50,6 +57,7 @@ void ParticleSystem::resolveCollisionsOctree() {
             p->posCur += -normal * depth * 0.5f;
             o->posCur += normal * depth * 0.5f;
         }
+        collisionsTestedThisFrame++;
     }
 }
 
@@ -96,7 +104,7 @@ void ParticleSystem::resolveCollisionsSAP() {
         }
 
         // sort intervals - O(Nlog(N))
-        std::sort(m_edgesX.front(), m_edgesX.back(), [](SAPEdge *left, SAPEdge *right) -> bool {return left->pos < right->pos;});
+        // std::sort(m_edgesX.front(), m_edgesX.back(), [](SAPEdge *left, SAPEdge *right) -> bool {return left->pos < right->pos;});
     }
 
 
@@ -112,12 +120,21 @@ void ParticleSystem::resolveCollisionsSAP() {
     m_edgesX.clear();
 }
 
-void ParticleSystem::render() {
+void ParticleSystem::renderWorld() {
     for (Particle &p : m_particles) {
         DrawSphere(p.posCur, p.radius, p.color);
     }
     DrawSphereWires({}, boundaryRadius, 8, 16, {255, 255, 255, 255});
-    DrawSphere({}, boundaryRadius, {255, 255, 255, 30});
+    // DrawSphere({}, boundaryRadius, {255, 255, 255, 30});
+    lastOctree.visualize();
+}
+
+void ParticleSystem::renderUI() {
+    char buffer[100];
+    std::snprintf(buffer, 100, "Particle Count: %zd", m_particles.size());
+    raylib::DrawText(buffer, 20, 100, 16, raylib::Color::White());
+    std::snprintf(buffer, 100, "Sqrt of Collisions Tested: %.2f", std::sqrt(static_cast<float>(collisionsTestedThisFrame)));
+    raylib::DrawText(buffer, 20, 120, 16, raylib::Color::White());
 }
 
 void ParticleSystem::addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius) {

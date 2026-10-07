@@ -15,8 +15,10 @@ class ParticleSystem {
 
         static constexpr float collisionTolerance = 0.01f;
         static constexpr float boundaryRadius = 20.0f;
-        static constexpr int subSteps = 2;
+        static constexpr int subSteps = 1;
 
+        Octree lastOctree;
+        size_t collisionsTestedThisFrame;
         std::vector<SAPEdge> m_edgesX;
         std::vector<Particle> m_particles;
         void updatePositions(float dt);
@@ -26,12 +28,12 @@ class ParticleSystem {
         void resolveCollisionsOctree();
         void resolveCollisionsN2();
         void resolveCollisionsSAP();
-
         
     public:
         // Must be called with a fixed dt
         void update(float dt);
-        void render();
+        void renderWorld();
+        void renderUI();
         void addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius);
 };
 
