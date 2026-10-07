@@ -40,11 +40,9 @@ void ParticleSystem::applyConstraints() {
 
 void ParticleSystem::resolveCollisionsOctree() {
     ZoneScoped;
-    // insert quadtree heres
     lastOctree = Octree(m_particles);
-    // std::cout << "particles in root" << lastOctree.getParticleCount() << std::endl;
-    // std::cout << "boundary: " << lastOctree.getBoundary().toString() << std::endl;
-    
+
+    // resolve all collisions
     for (auto &pair : lastOctree.findAllIntersections()) {
         auto p = pair.first;
         auto o = pair.second;

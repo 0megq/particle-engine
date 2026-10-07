@@ -18,6 +18,15 @@ struct Particle {
         posCur = posNew;
         acc = {};
     }
+
+    // circle to circle intersection test. If tolerance is positive then the combined
+    // radius is larger and a intersection is detected before particles are actually
+    // colliding.
+    bool intersects(Particle other, float radiusTolerance = -0.001f) {
+        auto const combinedRadiusWithTolerance = radius + other.radius + radiusTolerance;
+        auto const squaredDistance = (posCur - other.posCur).LengthSqr();
+        return squaredDistance < combinedRadiusWithTolerance * combinedRadiusWithTolerance;
+    }
 };
 
 

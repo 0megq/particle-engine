@@ -23,6 +23,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib_cpp)
 
+set(TRACY_ENABLE ON CACHE BOOL "Enable Tracy Profiler" FORCE)
 FetchContent_Declare(
     tracy
     GIT_REPOSITORY https://github.com/wolfpld/tracy.git
@@ -39,4 +40,3 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib raylib_cpp Tracy::TracyClient)
-target_compile_definitions(${PROJECT_NAME} PRIVATE TRACY_ENABLE)

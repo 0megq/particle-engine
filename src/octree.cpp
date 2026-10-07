@@ -16,7 +16,7 @@ raylib::Vector3 Octree::indexToVec(std::size_t idx) {
 }
 
 int Octree::vecToIndex(raylib::Vector3 vec) {
-    if (vec.x == 0 || vec.y == 0 || vec.z) return -1;
+    if (vec.x == 0 || vec.y == 0 || vec.z == 0) return -1;
 
     int idx = 0b000;
     if (vec.x > 0) idx |= 0b100;
@@ -103,7 +103,6 @@ void Octree::subdivide() {
             newParticles.push_back(particle);
             continue;
         }
-        std::cout << "adding particle to child" << std::endl;
         // Otherwise, add it to child
         m_children[static_cast<std::size_t>(octant)]->insert(particle);
     }
