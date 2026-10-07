@@ -19,6 +19,9 @@ class Application {
         ParticleSystem m_particleSystem;
         raylib::Window m_window;
         raylib::Camera3D m_camera;
+        
+        float m_hRotation = 0;
+        float m_vRotation = 0;
 
         void render();
 

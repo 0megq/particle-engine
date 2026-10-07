@@ -55,13 +55,17 @@ class Octree {
         // Constructs the entire octree, deriving the boundary
         // so that it contains all particles, and then inserting
         // all particles into the tree. O(n * log(n))
+        Octree();
         Octree(std::vector<Particle> &particles, const AABB &boundary = AABB{raylib::Vector3::Zero(), raylib::Vector3::Zero()});
         Octree(const AABB &boundary, std::size_t depth);
+        std::size_t getParticleCount() const;
+        AABB getBoundary() const;
         
         /// The particle's AABB must fit within the m_boundary. O(log(n))
         void insert(Particle *);
         std::vector<std::pair<Particle *, Particle *>> findAllIntersections() const;
         
+        void visualize() const;
 };
 
 

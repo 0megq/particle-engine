@@ -23,11 +23,20 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib_cpp)
 
+FetchContent_Declare(
+    tracy
+    GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+    GIT_TAG        v0.14.1
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(tracy)
+
 # Automatically find all C++ source files in src/
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 set(INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/src/")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE src ext/raylib-cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib raylib_cpp Tracy::TracyClient)
+target_compile_definitions(${PROJECT_NAME} PRIVATE TRACY_ENABLE)

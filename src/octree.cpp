@@ -1,6 +1,8 @@
-#include <octree.hpp>
+#include "octree.hpp"
+#include <tracy/Tracy.hpp>
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 
 raylib::Vector3 Octree::indexToVec(std::size_t idx) {
     // I chose to use bitwise operators instead of
@@ -43,6 +45,7 @@ int Octree::getOctant(const AABB &region) const {
 }
 
 void Octree::collectIntersectionsInDescendants(Particle *particle, std::vector<std::pair<Particle*,Particle*>> &intersections) const {
+    ZoneScoped;
     for (auto other : m_particles) {
         intersections.emplace_back(particle, other);
     }
@@ -57,6 +60,7 @@ void Octree::collectIntersectionsInDescendants(Particle *particle, std::vector<s
 
 void Octree::findAllIntersections(std::vector<std::pair<Particle*,Particle*>> &intersections) const {
     // for each particle
+    ZoneScopedN("finding all intersections child");
     for (int i = 0; i < m_particles.size(); i++) {
         for (int j = 0; j < i; j++) {
             intersections.emplace_back(m_particles[i], m_particles[j]);
@@ -99,7 +103,7 @@ void Octree::subdivide() {
             newParticles.push_back(particle);
             continue;
         }
-
+        std::cout << "adding particle to child" << std::endl;
         // Otherwise, add it to child
         m_children[static_cast<std::size_t>(octant)]->insert(particle);
     }
@@ -112,6 +116,18 @@ void Octree::subdivide() {
 
 bool Octree::isLeaf() const {
     return m_children[0].get() == nullptr;
+}
+
+std::size_t Octree::getParticleCount() const {
+    return m_particles.size();
+}
+
+AABB Octree::getBoundary() const {
+    return m_boundary;
+}
+
+Octree::Octree() {
+    
 }
 
 Octree::Octree(std::vector<Particle> &particles, const AABB &boundary) : m_depth(0) {
@@ -138,10 +154,10 @@ Octree::Octree(std::vector<Particle> &particles, const AABB &boundary) : m_depth
             max = max.Max(particle.posCur + raylib::Vector3::One() * particle.radius);
         }
 
-	auto halfSize = (max - min) * 0.5;
-	halfSize.x = halfSize.y = halfSize.z = std::max({halfSize.x, halfSize.y, halfSize.z});
+        auto halfSize = (max - min) * 0.5;
+        halfSize.x = halfSize.y = halfSize.z = std::max({halfSize.x, halfSize.y, halfSize.z});
 
-	// Add tolerance so halfSize is not zero when we have just a single particle
+	    // Add tolerance so halfSize is not zero when we have just a single particle
         m_boundary.halfSize = halfSize + raylib::Vector3::One() * 0.1;
         m_boundary.center = (max + min) * 0.5;
     }
@@ -189,6 +205,15 @@ void Octree::insert(Particle *particle) {
 
 std::vector<std::pair<Particle *, Particle *>> Octree::findAllIntersections() const {
     std::vector<std::pair<Particle *, Particle *>> res;
+    ZoneScopedN("total find all intersections");
     findAllIntersections(res);
     return res;
+}
+
+void Octree::visualize() const {
+    DrawCubeWiresV(m_boundary.center, m_boundary.halfSize * 2, raylib::Color::Red());
+    if (isLeaf()) return;
+    for (auto& child : m_children) {
+        child->visualize();
+    }
 }

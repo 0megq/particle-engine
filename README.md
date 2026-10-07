@@ -1,4 +1,4 @@
-# Particle engine in C++
+# Particle engine in C++ 17
 
 Uses raylib library. CMakeLists.txt is a modified version from [raylib-cpp's cmake template](https://github.com/RobLoach/raylib-cpp/blob/master/projects/CMake/CMakeLists.txt)
 
@@ -24,3 +24,6 @@ references:
 - https://www.flipcode.com/archives/Octree_Implementation.shtml, inspiration for using centered-aabb
 - https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html inspo for placing shared nodes only in parent
 - https://leanrada.com/notes/sweep-and-prune/
+
+how i'm fixing the octree:
+my first guess was that the octree was not really partitioning at all and all the children were being grouped into a single node

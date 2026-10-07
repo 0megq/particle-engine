@@ -1,0 +1,1 @@
+cmake --build build && cd build/Debug && particle-engine.exe

@@ -3,6 +3,7 @@
 
 #include "raylib-cpp.hpp"
 #include "particle.hpp"
+#include <sstream>
 
 struct AABB;
 
@@ -28,6 +29,14 @@ struct AABB {
         return (abs(center.x - other.center.x) < halfSize.x + other.halfSize.x) &&
                 (abs(center.y - other.center.y) < halfSize.y + other.halfSize.y) &&
                 (abs(center.z - other.center.z) < halfSize.z + other.halfSize.z);
+    }
+
+    std::string toString() {
+        std::stringstream ss;
+
+        ss << "AABB {" << center.x << "," << center.y << "," << center.z << "} " << "{" << halfSize.x << "," << halfSize.y << "," << halfSize.z << "}";
+
+        return ss.str();
     }
 };
 
