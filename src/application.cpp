@@ -66,6 +66,7 @@ void Application::run() {
 }
 
 void Application::render() {
+    ZoneScoped;
     m_window.BeginDrawing();
     m_window.ClearBackground(BLACK);
 
@@ -76,7 +77,10 @@ void Application::render() {
     m_camera.EndMode();
     m_window.DrawFPS(10, 10);
     m_particleSystem.renderUI();
-    m_window.EndDrawing();
+    {
+        ZoneScopedN("End Drawing");
+        m_window.EndDrawing();
+    }
 }
 
 void Application::shutdown() {
