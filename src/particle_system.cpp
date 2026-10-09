@@ -119,15 +119,18 @@ void ParticleSystem::resolveCollisionsSAP() {
 }
 
 void ParticleSystem::renderWorld() {
+    ZoneScoped;
     for (Particle &p : m_particles) {
-        DrawSphere(p.posCur, p.radius, p.color);
+        ZoneScopedN("drawing 1 particle");
+        DrawSphereEx(p.posCur, p.radius, 8, 8, p.color);
     }
     DrawSphereWires({}, boundaryRadius, 8, 16, {255, 255, 255, 255});
     // DrawSphere({}, boundaryRadius, {255, 255, 255, 30});
-    lastOctree.visualize();
+    // lastOctree.visualize();
 }
 
 void ParticleSystem::renderUI() {
+    ZoneScoped;
     char buffer[100];
     std::snprintf(buffer, 100, "Particle Count: %zd", m_particles.size());
     raylib::DrawText(buffer, 20, 100, 16, raylib::Color::White());
