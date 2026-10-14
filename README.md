@@ -44,3 +44,17 @@ okay i fixed it, but now the simulation seems to get highly unstable where parti
 i imagine this is because certain collisions aren't being detected, because a particle will be updated within the loop putting it into a colliding state with another particle. However, since that pair was not within the previous octree it fails.
 
 I will now instead just directly check for intersection in the octree and only do resolution in the particle system. this is similar to an approach used by [one of my references ](https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html).
+
+that didn't really work. maybe instead of that we just run the collisions multiple times a frame. Like twice.
+
+Okay I'm going back to the N2 check. I will optimize from the bottom up. First I will make small optimizations at the most granular level and slowly build up. First change I can make is to only run the checks for each pair once per frame. This makes it so 300 particles run at ~110 fps. Previously this was 5-10 fps.
+
+Next, I'll do a small optimization in the actual check to only use one sqrt. Actually profiling the change didn't seem to make a big difference (~5 FPS). I will keep it still. Right now at around ~120 fps with 300 particles.
+
+The next areas are now the actual amount of checks we do, how often, and how efficiently we can render the scene.
+
+Actually, before that. I looked at the amount of time it took per each check. It was 160ns. I then took the profiling check to just run once for all checks. I then divided by total amount of checks to get an approx individual check time. It was now 95ns. Then I enabled Release mode and this got me to ~3 ns! I could simulate 300 particles at 280 fps. Running 700 at 115fps. Wow I can get 1200 at 60fps!!
+
+Looking at the profiler, it shows that rendering is taking up abotu 14-15ms every frame. Collisions only take ~2ms.
+
+Great, so now I'll look into instancing.

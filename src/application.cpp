@@ -50,11 +50,11 @@ void Application::run() {
         m_fixedUpdateAccumulator += dt;
         while (m_fixedUpdateAccumulator > fixedUpdateDelta) {
             ZoneScopedN("particle update");
-            if (m_fixedFrameCount % 5 == 0) {
-                m_particleSystem.addParticle({5.0f, 5.0f, (float)GetRandomValue(4,6)}, {}, fixedUpdateDelta, raylib::Color((char)GetRandomValue(0,255), (char)GetRandomValue(0,255), (char)GetRandomValue(0,255)), 0.5f);
+            if (m_fixedFrameCount % 3 == 0 && dt < fixedUpdateDelta) {
+                m_particleSystem.addParticle(raylib::Vector3(std::cos(m_fixedFrameCount * 0.05f), 0.0f, std::sin(m_fixedFrameCount * 0.05f)) * 16.0f, {}, fixedUpdateDelta, raylib::Color((char)GetRandomValue(80,255), (char)GetRandomValue(80,255), (char)GetRandomValue(80,255)), 0.5f);
             }
             m_fixedUpdateAccumulator -= fixedUpdateDelta;
-            m_particleSystem.update(fixedUpdateDelta * 4);
+            m_particleSystem.update(fixedUpdateDelta);
             m_fixedFrameCount++;
         }
 

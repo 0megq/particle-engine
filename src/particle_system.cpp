@@ -11,15 +11,16 @@ void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
         applyGravity();
         updatePositions(dt / subSteps);
+        collisionsResolvedThisFrame = 0;
         collisionsTestedThisFrame = 0;
-        resolveCollisionsOctree();
+        resolveCollisionsN2();
         applyConstraints();
     }
 }
 
 void ParticleSystem::applyGravity() {
     for (Particle &p : m_particles) {
-        p.acc += {0.0f, -32.0f, 0.0f};
+        p.acc += {0.0f, -64.0f, 0.0f};
     }
 }
 
@@ -54,23 +55,32 @@ void ParticleSystem::resolveCollisionsOctree() {
             auto const normal = pToO.Normalize();
             p->posCur += -normal * depth * 0.5f;
             o->posCur += normal * depth * 0.5f;
+            collisionsResolvedThisFrame++;
         }
         collisionsTestedThisFrame++;
     }
 }
 
 void ParticleSystem::resolveCollisionsN2() {
-    for (Particle &p : m_particles) {
-        for (Particle &o : m_particles) {
+    ZoneScoped;
+    for (int i = 0; i < m_particles.size(); i++) {
+        Particle &p = m_particles[i];
+        for (int j = i+1; j < m_particles.size(); j++) {
+            Particle &o = m_particles[j];
             auto const combinedRadius = (o.radius + p.radius);
             auto const combinedRadiusWithTolerance = combinedRadius - collisionTolerance;
             auto const pToO = o.posCur - p.posCur;
-            if (pToO.LengthSqr() < combinedRadiusWithTolerance * combinedRadiusWithTolerance) {
-                auto const depth = combinedRadius - pToO.Length();
-                auto const normal = pToO.Normalize();
-                p.posCur += -normal * depth * 0.5f;
-                o.posCur += normal * depth * 0.5f;
+            auto const distanceSquared = pToO.LengthSqr();
+            if (distanceSquared < combinedRadiusWithTolerance * combinedRadiusWithTolerance) {
+                auto const distance = std::sqrt(distanceSquared);
+                auto const depth = combinedRadius - distance;
+                auto const displacement = pToO * (depth / distance) * 0.5f;
+
+                p.posCur += -displacement;
+                o.posCur += displacement;
+                collisionsResolvedThisFrame++;
             }
+            collisionsTestedThisFrame++;
         }
     }
 }
@@ -118,6 +128,10 @@ void ParticleSystem::resolveCollisionsSAP() {
     m_edgesX.clear();
 }
 
+size_t ParticleSystem::getParticleCount() {
+    return m_particles.size();
+}
+
 void ParticleSystem::renderWorld() {
     ZoneScoped;
     for (Particle &p : m_particles) {
@@ -126,7 +140,7 @@ void ParticleSystem::renderWorld() {
     }
     DrawSphereWires({}, boundaryRadius, 8, 16, {255, 255, 255, 255});
     // DrawSphere({}, boundaryRadius, {255, 255, 255, 30});
-    // lastOctree.visualize();
+    lastOctree.visualize();
 }
 
 void ParticleSystem::renderUI() {
@@ -134,8 +148,10 @@ void ParticleSystem::renderUI() {
     char buffer[100];
     std::snprintf(buffer, 100, "Particle Count: %zd", m_particles.size());
     raylib::DrawText(buffer, 20, 100, 16, raylib::Color::White());
-    std::snprintf(buffer, 100, "Sqrt of Collisions Tested: %.2f", std::sqrt(static_cast<float>(collisionsTestedThisFrame)));
+    std::snprintf(buffer, 100, "Collisions Tested: %.2f", static_cast<float>(collisionsTestedThisFrame));
     raylib::DrawText(buffer, 20, 120, 16, raylib::Color::White());
+    std::snprintf(buffer, 100, "Collisions Resolved: %.2f", static_cast<float>(collisionsResolvedThisFrame));
+    raylib::DrawText(buffer, 20, 140, 16, raylib::Color::White());
 }
 
 void ParticleSystem::addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius) {
