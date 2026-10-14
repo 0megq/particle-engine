@@ -18,6 +18,7 @@ class ParticleSystem {
         static constexpr int subSteps = 1;
 
         Octree lastOctree;
+        size_t collisionsResolvedThisFrame;
         size_t collisionsTestedThisFrame;
         std::vector<SAPEdge> m_edgesX;
         std::vector<Particle> m_particles;
@@ -35,6 +36,7 @@ class ParticleSystem {
         void renderWorld();
         void renderUI();
         void addParticle(raylib::Vector3 pos, raylib::Vector3 vel, float delta, raylib::Color color, float radius);
+        size_t getParticleCount();
 };
 
 #endif
