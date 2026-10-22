@@ -134,6 +134,7 @@ size_t ParticleSystem::getParticleCount() {
 
 void ParticleSystem::renderWorld() {
     ZoneScoped;
+    // TODO: implement mesh instacing and also make a pretty shader
     for (Particle &p : m_particles) {
         ZoneScopedN("drawing 1 particle");
         DrawSphereEx(p.posCur, p.radius, 8, 8, p.color);
