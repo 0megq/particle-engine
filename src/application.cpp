@@ -3,6 +3,7 @@
 #include <tracy/Tracy.hpp>
 #include "application.hpp"
 #include "particle.hpp"
+#include "mesh_instancing.hpp"
 
 
 Application::Application(int screenWidth, int screenHeight) :
@@ -71,6 +72,8 @@ void Application::render() {
     m_window.ClearBackground(BLACK);
 
     m_camera.BeginMode();
+    
+    SphereInstancingDemo();
 
     m_particleSystem.renderWorld();
 
