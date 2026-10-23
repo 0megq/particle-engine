@@ -4,7 +4,7 @@
 
 // Input vertex attributes
 in vec3 vertexPosition;
-in vec4 vertexColor;
+// in vec4 vertexColor;
 
 in mat4 instanceTransform;
 
@@ -17,7 +17,7 @@ out vec4 fragColor;
 void main()
 {
     // Send vertex attributes to fragment shader
-    fragColor = vertexColor;
+    fragColor = vec4(1.0,1.0,1.0,1.0);
 
     // Calculate final vertex position, note that we multiply mvp by instanceTransform
     gl_Position = mvp*instanceTransform*vec4(vertexPosition, 1.0);
