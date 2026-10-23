@@ -15,7 +15,6 @@ Application::Application(int screenWidth, int screenHeight) :
     m_camera.SetTarget({});
     m_camera.SetUp({0.0f, 1.0f, 0.0f});
     // m_particleSystem.addParticle({10.0f, 5.0f, 8.0f}, {}, fixedUpdateDelta);
-
 }
 
 void Application::run() {
@@ -72,14 +71,15 @@ void Application::render() {
     m_window.ClearBackground(BLACK);
 
     m_camera.BeginMode();
-    
-    SphereInstancingDemo();
 
-    m_particleSystem.renderWorld();
+
+    SphereInstancingDemo(false);
+
+    // m_particleSystem.renderWorld();
 
     m_camera.EndMode();
     m_window.DrawFPS(10, 10);
-    m_particleSystem.renderUI();
+    // m_particleSystem.renderUI();
     {
         ZoneScopedN("End Drawing");
         m_window.EndDrawing();
@@ -87,5 +87,6 @@ void Application::render() {
 }
 
 void Application::shutdown() {
+    // SphereInstancingDemo(true);
     m_window.Close();
 }
