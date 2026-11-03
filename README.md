@@ -58,3 +58,5 @@ Actually, before that. I looked at the amount of time it took per each check. It
 Looking at the profiler, it shows that rendering is taking up abotu 14-15ms every frame. Collisions only take ~2ms.
 
 Great, so now I'll look into instancing.
+
+Implemented basic mesh instancing. and I can say that it made a HUGE difference. I can now simulate ~3000 at more than 60 fps. A discussion on this change and its improvements would be nice to do. Next steps would be to add back in coloring and then start to do some more fun things with it, or optimize collisions using Sweep and Prune or Octrees.
