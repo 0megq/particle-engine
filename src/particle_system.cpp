@@ -7,6 +7,10 @@
 #include <cstdio>
 #include <cmath>
 
+void ParticleSystem::initialize() {
+    particleRenderer.initialize();
+}
+
 void ParticleSystem::update(float dt) {
     for (int step = 0; step < subSteps; step++){
         applyGravity();
@@ -62,7 +66,7 @@ void ParticleSystem::resolveCollisionsOctree() {
 }
 
 void ParticleSystem::resolveCollisionsN2() {
-    ZoneScoped;
+    ZoneScopedN("collisions");
     for (int i = 0; i < m_particles.size(); i++) {
         Particle &p = m_particles[i];
         for (int j = i+1; j < m_particles.size(); j++) {
@@ -134,11 +138,17 @@ size_t ParticleSystem::getParticleCount() {
 
 void ParticleSystem::renderWorld() {
     ZoneScoped;
-    // TODO: implement mesh instacing and also make a pretty shader
-    for (Particle &p : m_particles) {
-        ZoneScopedN("drawing 1 particle");
-        DrawSphereEx(p.posCur, p.radius, 8, 8, p.color);
-    }
+
+    // new version
+    particleRenderer.renderParticles(m_particles);
+
+    // old version
+    // for (Particle &p : m_particles) {
+    //     ZoneScopedN("drawing 1 particle");
+    //     DrawSphereEx(p.posCur, p.radius, 8, 8, p.color);
+    // }
+
+    // boundary
     DrawSphereWires({}, boundaryRadius, 8, 16, {255, 255, 255, 255});
     // DrawSphere({}, boundaryRadius, {255, 255, 255, 30});
     lastOctree.visualize();

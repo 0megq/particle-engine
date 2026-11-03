@@ -4,6 +4,7 @@
 #include "raylib-cpp.hpp"
 #include "particle.hpp"
 #include "octree.hpp"
+#include "mesh_instance_renderer.hpp"
 
 class ParticleSystem {
     private:
@@ -17,6 +18,7 @@ class ParticleSystem {
         static constexpr float boundaryRadius = 20.0f;
         static constexpr int subSteps = 1;
 
+        MeshInstanceRenderer particleRenderer;
         Octree lastOctree;
         size_t collisionsResolvedThisFrame;
         size_t collisionsTestedThisFrame;
@@ -32,6 +34,7 @@ class ParticleSystem {
         
     public:
         // Must be called with a fixed dt
+        void initialize();
         void update(float dt);
         void renderWorld();
         void renderUI();
