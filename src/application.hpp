@@ -16,6 +16,7 @@ class Application {
         int m_frameCount = 0;
         int m_fixedFrameCount = 0;
         float m_fixedUpdateAccumulator = 0.0f;
+        bool m_simulationPaused = true;
         ParticleSystem m_particleSystem;
         raylib::Window m_window;
         raylib::Camera3D m_camera;

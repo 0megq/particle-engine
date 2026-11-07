@@ -3,6 +3,7 @@
 #include <tracy/Tracy.hpp>
 #include "application.hpp"
 #include "particle.hpp"
+#include "utils.hpp"
 
 
 Application::Application(int screenWidth, int screenHeight) :
@@ -34,6 +35,10 @@ void Application::run() {
         if (IsKeyDown(KEY_DOWN)){
             m_vRotation += -dt;
         }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            m_simulationPaused = !m_simulationPaused;
+        }
         
         m_vRotation = std::min(PI / 2 - 0.05f, m_vRotation);
         m_vRotation = std::max(-PI / 2 + 0.05f, m_vRotation);
@@ -47,7 +52,7 @@ void Application::run() {
                             } * 70.0f;
 
         // Update particles
-        m_fixedUpdateAccumulator += dt;
+        if (!m_simulationPaused) m_fixedUpdateAccumulator += dt;
         while (m_fixedUpdateAccumulator > fixedUpdateDelta) {
             ZoneScopedN("particle update");
             if (m_fixedFrameCount % 3 == 0 && dt < fixedUpdateDelta) {
@@ -77,6 +82,10 @@ void Application::render() {
     m_camera.EndMode();
     m_window.DrawFPS(10, 10);
     m_particleSystem.renderUI();
+    if (m_simulationPaused) {
+        DrawTextCentered("Paused", m_screenWidth / 2, m_screenHeight / 2, 32, GREEN);
+    }
+
     {
         ZoneScopedN("End Drawing");
         m_window.EndDrawing();
