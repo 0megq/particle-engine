@@ -47,7 +47,7 @@ I will now instead just directly check for intersection in the octree and only d
 
 that didn't really work. maybe instead of that we just run the collisions multiple times a frame. Like twice.
 
-Okay I'm going back to the N2 check. I will optimize from the bottom up. First I will make small optimizations at the most granular level and slowly build up. First change I can make is to only run the checks for each pair once per frame. This makes it so 300 particles run at ~110 fps. Previously this was 5-10 fps.
+Okay I'm going back to the N2 check. I will optimize from the bottom up. First I will make small optimizations at the most granular level and slowly build up. First change I can make is to only run the checks for each pair once per frame. Previously, all pairs were checked twice, and even particles themselves would be checked against themselves. This change makes it so 300 particles run at ~110 fps. Previously this was 5-10 fps.
 
 Next, I'll do a small optimization in the actual check to only use one sqrt. Actually profiling the change didn't seem to make a big difference (~5 FPS). I will keep it still. Right now at around ~120 fps with 300 particles.
 
@@ -60,3 +60,11 @@ Looking at the profiler, it shows that rendering is taking up abotu 14-15ms ever
 Great, so now I'll look into instancing.
 
 Implemented basic mesh instancing. and I can say that it made a HUGE difference. I can now simulate ~3000 at more than 60 fps. A discussion on this change and its improvements would be nice to do. Next steps would be to add back in coloring and then start to do some more fun things with it, or optimize collisions using Sweep and Prune or Octrees.
+
+Optimization Timeline (so I know what improved performance and by how much):
+- Tried to optimize with Octree
+- Profiled it and tried to fix Octree, but gave up
+- Then fixed N2 check to check pairs only once. 300 particles running at 110fps, previously 5-10fps for 300
+- Then optimized collision check to just use a single sqrt. This improved performance to 120 fps for 300 particles
+- After that, I profiled the individual collision checks. 160ns. I toggled release mode on and it went down to 3ns. 300 particles at 280 fps.
+- Rendering took majority of time (14-15 ms) when running 1200 particles at 60 fps. Collisions only took 2ms. I implemented mesh instancing so spheres are drawn in a single batch. This improved it to 3000 particles at 60fps.
