@@ -1,7 +1,7 @@
 #version 330
 
 const vec3 lightDir = vec3(0.707,0,0.707);
-const vec3 lightColor = vec3(1,1,1);
+const vec3 lightColor = vec3(1,0.5,0.5);
 const vec4 ambientLight = vec4(0.3,0.3,0,0);
 
 in vec3 fragNormal;
